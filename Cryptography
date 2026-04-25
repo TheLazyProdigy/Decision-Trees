@@ -1,0 +1,299 @@
+TOOLS (always ready)
+│
+├── CyberChef (magic / quick decode)
+├── Python / SageMath
+├── factordb.com
+├── RsaCtfTool
+├── dcode.fr
+├── hashcat / john
+├── CrackStation (fast hash lookup)
+├── quipqiup (substitution solver)
+├── xxd / base64 / openssl
+├── z3
+├── gmpy2 / sympy / Crypto.Util.number
+└── oeis.org (sequence recognition)
+
+────────────────────────────────────────
+
+GOLDEN RULE:
+→ FIRST: ENCODING OR CRYPTO?
+→ MOST CHALLS = BROKEN IMPLEMENTATION
+→ LOOK FOR REUSE (key / nonce / randomness)
+→ USE KNOWN PLAINTEXT ("flag{")
+
+────────────────────────────────────────
+
+MINIMAL CHECKLIST
+│
+├── Try decoding:
+│   ├── base64 / base32 / hex
+│   ├── URL / HTML encoding
+│   └── CyberChef Magic
+│
+├── If hash:
+│   ├── identify type
+│   ├── CrackStation (instant lookup)
+│   ├── hashcat / john
+│
+├── If text-like:
+│   ├── Caesar / ROT
+│   ├── substitution → quipqiup
+│   └── frequency analysis
+│
+├── If numbers given:
+│   ├── RSA params (n, e, c)
+│   ├── AES IV/nonce
+│   └── repeated values
+│
+└── Look for:
+    ├── flag{
+    ├── JSON / known formats
+    └── repeated patterns
+
+────────────────────────────────────────
+
+START
+│
+├── [1] READ CHALLENGE
+│   │
+│   ├── Identify:
+│   │   ├── ciphertext / plaintext?
+│   │   ├── source code?
+│   │   ├── RSA params?
+│   │   ├── oracle/server?
+│   │   └── multiple samples?
+│   │
+│   └── Ask:
+│       ├── encoding?
+│       ├── classical?
+│       ├── XOR?
+│       ├── RSA?
+│       ├── AES?
+│       └── math/randomness?
+│
+├── [2] ENCODING / REPRESENTATION
+│   │
+│   ├── base64 / base32 / base58
+│   ├── hex → xxd -r -p
+│   ├── binary → ASCII
+│   ├── URL / HTML decode
+│   ├── compression (gzip/zlib/xz)
+│   │
+│   └── Recursive decode:
+│       └── CyberChef Magic
+│
+├── [3] CLASSICAL CIPHERS
+│   │
+│   ├── Caesar / ROT
+│   │   └── brute 0–25 shifts
+│   │
+│   ├── Substitution cipher
+│   │   ├── frequency analysis
+│   │   ├── word patterns
+│   │   └── quipqiup (AUTO SOLVE)
+│   │
+│   ├── Vigenère
+│   │   ├── repeating key
+│   │   └── known plaintext
+│   │
+│   ├── Transposition
+│   │   └── rearrangement patterns
+│   │
+│   └── Visual ciphers
+│       ├── Morse / Bacon
+│       └── symbols → letters
+│
+├── [4] XOR BRANCH
+│   │
+│   ├── Single-byte XOR
+│   │   ├── brute 0–255
+│   │   ├── score English
+│   │   └── search flag{
+│   │
+│   ├── Repeating-key XOR
+│   │   ├── find key length
+│   │   ├── Hamming distance
+│   │   └── solve per column
+│   │
+│   ├── Known plaintext
+│   │   ├── XOR with "flag{"
+│   │   └── recover key
+│   │
+│   ├── Many-time pad
+│   │   ├── c1 ^ c2 = p1 ^ p2
+│   │   ├── crib dragging
+│   │   └── recover plaintexts
+│   │
+│   └── Signs:
+│       ├── same length ciphertexts
+│       └── reused key
+│
+├── [5] HASHES
+│   │
+│   ├── Identify hash
+│   │   ├── MD5 / SHA1 / SHA256
+│   │   └── hashid
+│   │
+│   ├── Crack
+│   │   ├── CrackStation (FASTEST)
+│   │   ├── hashcat / john
+│   │   └── wordlists (rockyou)
+│   │
+│   ├── Weak logic
+│   │   ├── unsalted
+│   │   ├── predictable password
+│   │   ├── magic hashes
+│   │   └── type juggling
+│   │
+│   └── Special
+│       ├── MD5 collision
+│       └── length extension
+│
+├── [6] RSA BRANCH
+│   │
+│   ├── Given n, e, c
+│   │   ├── try RsaCtfTool
+│   │   ├── FactorDB lookup
+│   │   └── attempt factorization
+│   │
+│   ├── Factor attacks
+│   │   ├── small n
+│   │   ├── Fermat (close primes)
+│   │   ├── gcd(n1, n2)
+│   │   └── leaked bits
+│   │
+│   ├── Small exponent
+│   │   ├── e = 3
+│   │   ├── m^e < n
+│   │   └── integer root
+│   │
+│   ├── Common modulus
+│   │   └── same n, diff e
+│   │
+│   ├── Wiener attack
+│   │   └── small d
+│   │
+│   ├── Padding/oracle
+│   │   ├── PKCS#1 issues
+│   │   └── chosen ciphertext
+│   │
+│   └── Weird RSA
+│       ├── multi-prime
+│       └── bad keygen
+│
+├── [7] AES / BLOCK CIPHERS
+│   │
+│   ├── Identify mode
+│   │   ├── ECB / CBC / CTR / GCM
+│   │
+│   ├── ECB
+│   │   ├── repeated blocks
+│   │   └── cut-and-paste
+│   │
+│   ├── CBC
+│   │   ├── IV reuse
+│   │   ├── bit flipping
+│   │   └── padding oracle
+│   │
+│   ├── CTR
+│   │   ├── nonce reuse
+│   │   ├── keystream reuse
+│   │   └── XOR attack
+│   │
+│   ├── GCM
+│   │   ├── nonce reuse fatal
+│   │   └── tag forgery
+│   │
+│   └── Common bugs
+│       ├── static IV
+│       ├── hardcoded key
+│       └── weak randomness
+│
+├── [8] RANDOMNESS / STREAM
+│   │
+│   ├── Python random
+│   │   ├── predictable seed
+│   │   └── time-based
+│   │
+│   ├── MT19937
+│   │   ├── recover state
+│   │   └── predict outputs
+│   │
+│   ├── LCG
+│   │   ├── recover parameters
+│   │   └── predict next
+│   │
+│   └── Nonce/key reuse
+│
+├── [9] ECC / SIGNATURES
+│   │
+│   ├── ECDSA
+│   │   ├── reused nonce → private key
+│   │   └── biased nonce
+│   │
+│   ├── Weak curve
+│   │   └── small order
+│   │
+│   └── Tools:
+│       └── SageMath
+│
+├── [10] ORACLES
+│   │
+│   ├── Encryption oracle
+│   │   └── chosen plaintext
+│   │
+│   ├── Decryption oracle
+│   │   ├── padding oracle
+│   │   └── parity oracle
+│   │
+│   ├── Signing oracle
+│   │   └── signature forgery
+│   │
+│   └── Automate with Python
+│
+├── [11] MATH / MODULAR
+│   │
+│   ├── modular inverse
+│   ├── CRT
+│   ├── integer roots
+│   ├── lattices (Coppersmith)
+│   └── z3 constraints
+│
+├── [12] SOURCE CODE GIVEN
+│   │
+│   ├── inspect key generation
+│   ├── inspect randomness
+│   ├── inspect IV/nonce reuse
+│   ├── inspect leaks (debug prints)
+│   └── identify broken assumptions
+│
+├── [13] COMMON CTF SMELLS
+│   │
+│   ├── e=3 → small exponent RSA
+│   ├── repeated nonce → CTR/GCM break
+│   ├── same n → common modulus
+│   ├── repeated ciphertext → XOR
+│   ├── MD5 → CrackStation
+│   ├── English-like text → quipqiup
+│   └── Python random → predictable
+│
+├── [14] IF STUCK
+│   │
+│   ├── re-check encoding
+│   ├── search repetition
+│   ├── try known plaintext
+│   ├── factor n
+│   ├── check mode/nonce
+│   ├── collect more samples
+│   └── simplify problem
+│
+└── [15] FLAG
+    │
+    ├── Direct:
+    │   ├── decoded text
+    │   └── cracked hash
+    │
+    └── Indirect:
+        ├── recovered key
+        ├── decrypted data
+        └── forged signature
