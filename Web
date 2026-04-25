@@ -1,0 +1,229 @@
+Tools used in web challs:
+      ffuf
+      dirb
+      gobuster
+      curl
+
+GOLDEN RULE: KEEP BURP SUITE OPEN.
+
+Minimal field checklist:
+      [ ] robots.txt
+      [ ] page source
+      [ ] JS files
+      [ ] cookies
+      [ ] headers
+      [ ] hidden endpoints (/flag.txt)
+      [ ] login/register/reset
+      [ ] parameter tampering
+      [ ] IDOR
+      [ ] SQLi/NoSQLi
+      [ ] XSS/SSTI
+      [ ] file upload/LFI
+      [ ] admin-only routes
+      [ ] debug/error leaks
+      [ ] JWT/session flaws
+
+START
+ |
+ |--[1] Read the challenge carefully
+ |      |
+ |      |-- Look for:
+ |           - given URL
+ |           - source code / attachments
+ |           - hint text
+ |           - flag format
+ |
+ |--[2] Recon the app
+ |      |
+ |      |-- Open site normally
+ |      |-- Check:
+ |           - all pages
+ |           - login/register
+ |           - search bars
+ |           - upload forms
+ |           - admin panels
+ |           - API endpoints
+ |           - robots.txt / sitemap.xml
+ |           - .git / backups / hidden dirs
+ |           - comments in HTML/JS
+ |           - cookies / localStorage
+ |           - response headers
+ |
+ |--[3] Is source code provided?
+ |      |
+ |      |-- YES --> Review for:
+ |      |          - hardcoded creds
+ |      |          - routes/endpoints
+ |      |          - auth logic flaws
+ |      |          - debug mode
+ |      |          - dangerous functions
+ |      |          - SQL queries
+ |      |          - template rendering
+ |      |          - file handling
+ |      |          - secret keys / JWT secret
+ |      |
+ |      |-- NO --> Use browser + proxy to infer behavior
+ |
+ |--[4] Identify input points
+ |      |
+ |      |-- URL params?
+ |      |-- POST body?
+ |      |-- JSON body?
+ |      |-- Headers?
+ |      |-- Cookies?
+ |      |-- File upload?
+ |      |-- WebSocket?
+ |      |-- Path segments?
+ |
+ |--[5] For each input point, ask:
+ |      |
+ |      |-- Is input reflected in response?
+ |      |      |
+ |      |      |-- YES --> Test XSS / SSTI / HTML injection
+ |      |      |
+ |      |      |-- NO --> Continue
+ |      |
+ |      |-- Does input affect DB queries?
+ |      |      |
+ |      |      |-- YES --> Test SQLi / NoSQLi
+ |      |
+ |      |-- Does input affect file/path access?
+ |      |      |
+ |      |      |-- YES --> Test LFI / RFI / path traversal
+ |      |
+ |      |-- Does input get sent to shell/system call?
+ |      |      |
+ |      |      |-- YES --> Test command injection
+ |      |
+ |      |-- Does input reach template engine?
+ |      |      |
+ |      |      |-- YES --> Test SSTI
+ |      |
+ |      |-- Does input alter object/ID?
+ |      |      |
+ |      |      |-- YES --> Test IDOR / access control
+ |      |
+ |      |-- Is input deserialized / parsed specially?
+ |      |      |
+ |      |      |-- YES --> Test insecure deserialization / parser abuse
+ |
+ |--[6] Authentication / Session branch
+ |      |
+ |      |-- Can you register?
+ |      |      |
+ |      |      |-- YES --> Check role assignment, default privileges
+ |      |
+ |      |-- Login present?
+ |      |      |
+ |      |      |-- Test:
+ |      |           - SQLi in login
+ |      |           - weak password reset
+ |      |           - JWT tampering
+ |      |           - cookie forgery
+ |      |           - session fixation
+ |      |           - missing authorization checks
+ |      |           - username/email enumeration
+ |      |
+ |      |-- Admin-only functionality exists?
+ |             |
+ |             |-- Test direct access / IDOR / hidden params
+ |
+ |--[7] Client-side branch
+ |      |
+ |      |-- Read JavaScript files
+ |      |-- Search for:
+ |           - API endpoints
+ |           - hidden routes
+ |           - tokens / keys
+ |           - obfuscated logic
+ |           - flag fragments
+ |           - local validation only
+ |           - debug functions
+ |
+ |--[8] API branch
+ |      |
+ |      |-- Is there /api, GraphQL, JSON endpoints?
+ |      |      |
+ |      |      |-- YES --> Test:
+ |      |           - unauthenticated access
+ |      |           - IDOR
+ |      |           - mass assignment
+ |      |           - GraphQL introspection
+ |      |           - hidden methods (PUT/PATCH/DELETE)
+ |      |           - content-type confusion
+ |
+ |--[9] File upload branch
+ |      |
+ |      |-- Upload allowed?
+ |      |      |
+ |      |      |-- YES --> Test:
+ |      |           - extension bypass
+ |      |           - MIME bypass
+ |      |           - polyglot files
+ |      |           - filename traversal
+ |      |           - SVG XSS
+ |      |           - server-side processing bugs
+ |      |           - upload + include/execute chain
+ |
+ |--[10] Server behavior branch
+ |       |
+ |       |-- Different responses for malformed input?
+ |       |      |
+ |       |      |-- YES --> Probe for:
+ |       |           - verbose errors
+ |       |           - stack traces
+ |       |           - framework fingerprints
+ |       |           - type confusion
+ |       |
+ |       |-- Strange redirects / proxy headers?
+ |              |
+ |              |-- Test Host header / X-Forwarded-* issues
+ |
+ |--[11] Common vuln checklist
+ |       |
+ |       |-- XSS?
+ |       |-- SQLi?
+ |       |-- NoSQLi?
+ |       |-- SSTI?
+ |       |-- SSRF?
+ |       |-- CSRF?
+ |       |-- XXE?
+ |       |-- LFI/RFI?
+ |       |-- Path traversal?
+ |       |-- Command injection?
+ |       |-- IDOR?
+ |       |-- Auth bypass?
+ |       |-- JWT flaws?
+ |       |-- File upload abuse?
+ |       |-- Open redirect?
+ |       |-- Prototype pollution?
+ |       |-- Request smuggling? (rare in CTF but possible)
+ |
+ |--[12] If stuck
+ |       |
+ |       |-- Compare normal user vs admin behavior
+ |       |-- Change one parameter at a time
+ |       |-- Fuzz hidden dirs/endpoints
+ |       |-- Read all JS again
+ |       |-- Trigger errors intentionally
+ |       |-- Check cookies/tokens format
+ |       |-- Look at challenge title for hints
+ |       |-- Search for framework-specific bugs
+ |       |-- Chain smaller issues together
+ |
+ |--[13] Flag retrieval
+         |
+         |-- Found direct flag in:
+         |      - page source
+         |      - response
+         |      - comments
+         |      - JS
+         |      - config
+         |
+         |-- Otherwise exploit vuln to read:
+                - /flag
+                - flag.txt
+                - env/config
+                - admin notes
+                - database contents
+                - internal service response
