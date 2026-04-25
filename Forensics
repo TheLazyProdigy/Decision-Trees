@@ -1,0 +1,253 @@
+START
+│
+├── 0. INITIAL RECON (ALWAYS FIRST — NO EXCEPTIONS)
+│   ├── file chall
+│   ├── strings chall | grep -iE "flag|ctf|key|pass|admin"
+│   ├── strings chall | head / tail
+│   ├── exiftool chall
+│   ├── binwalk chall
+│   ├── binwalk -e chall
+│   ├── xxd chall | head
+│   ├── hexdump -C chall | head
+│   ├── foremost chall
+│   └── check file size, entropy, weird patterns
+│
+├── 1. CONTEXT CHECK (IMPORTANT)
+│   ├── Single file?
+│   ├── Multiple files / dump?
+│   ├── Website / directory?
+│   ├── Memory / disk / network?
+│   └── Challenge name hints (steg, hidden, lost, deleted, etc.)
+│
+├── 🌐 WEB / DIRECTORY / SOURCE DUMP
+│   │
+│   ├── Look for sensitive files
+│   │   ├── .git/ .env .htaccess
+│   │   ├── backup files (.bak, ~, .old)
+│   │   ├── config files
+│   │   └── hidden directories
+│   │
+│   ├── 🔥 GIT REPO FOUND (.git/)
+│   │   │
+│   │   ├── Dump repo
+│   │   │   ├── git-dumper URL/.git/ dump/
+│   │   │   ├── wget -r URL/.git/
+│   │   │   └── manually reconstruct
+│   │   │
+│   │   ├── Rebuild repo
+│   │   │   ├── cd dump
+│   │   │   ├── git checkout .
+│   │   │   ├── git reset --hard
+│   │   │   └── git status
+│   │   │
+│   │   ├── Analyze history (VERY IMPORTANT)
+│   │   │   ├── git log
+│   │   │   ├── git log --oneline --graph --all
+│   │   │   ├── git show <commit>
+│   │   │   ├── git diff <commit1> <commit2>
+│   │   │   ├── git checkout <commit>
+│   │   │   ├── git reflog
+│   │   │   └── git fsck --lost-found
+│   │   │
+│   │   ├── Search secrets
+│   │   │   ├── grep -r "flag" .
+│   │   │   ├── grep -r "password" .
+│   │   │   ├── git grep flag
+│   │   │   └── look at deleted files in old commits
+│   │   │
+│   │   └── Common findings
+│   │       ├── deleted flags
+│   │       ├── API keys / tokens
+│   │       ├── credentials
+│   │       └── hidden endpoints
+│   │
+│   └── General analysis
+│       ├── grep -r "flag" .
+│       ├── analyze source code
+│       └── check comments
+│
+├── 📷 IMAGE FORENSICS (.png .jpg .bmp .gif)
+│   │
+│   ├── Basic analysis
+│   │   ├── file image
+│   │   ├── identify image
+│   │   ├── identify -verbose image
+│   │   ├── exiftool image
+│   │   ├── strings image
+│   │   └── pngcheck -v image.png
+│   │
+│   ├── Hidden data / carving
+│   │   ├── binwalk image
+│   │   ├── binwalk -e image
+│   │   ├── foremost image
+│   │   ├── dd (manual carve)
+│   │   └── check EOF extra data (xxd)
+│   │
+│   ├── Steganography
+│   │   ├── steghide info image
+│   │   ├── steghide extract -sf image
+│   │   ├── stegseek image wordlist.txt
+│   │   ├── stegcracker image wordlist.txt
+│   │   ├── zsteg image.png
+│   │   └── stegsolve (LSB / filters)
+│   │
+│   ├── PNG-specific tricks
+│   │   ├── pngcheck (broken chunks)
+│   │   ├── inspect IDAT chunks
+│   │   ├── check tEXt / zTXt / iTXt
+│   │   ├── fix corrupted headers
+│   │   └── recombine chunks
+│   │
+│   ├── Visual analysis
+│   │   ├── color channels
+│   │   ├── LSB extraction
+│   │   ├── alpha channel
+│   │   ├── palette anomalies
+│   │   └── stegsolve planes
+│   │
+│   └── Other tricks
+│       ├── QR / barcode → zbarimg
+│       ├── multi-frame GIF analysis
+│       └── compare images (diff)
+│
+├── 🔊 AUDIO FORENSICS (.wav .mp3)
+│   │
+│   ├── Listen normally
+│   ├── Audacity
+│   │   ├── spectrogram
+│   │   ├── reverse
+│   │   ├── speed up / slow down
+│   │   └── noise reduction
+│   │
+│   ├── strings audio
+│   ├── binwalk audio
+│   └── check hidden data
+│
+├── 📄 DOCUMENT FORENSICS (.pdf .docx .xlsx)
+│   │
+│   ├── exiftool file
+│   ├── strings file
+│   ├── binwalk file
+│   │
+│   ├── PDF
+│   │   ├── pdfimages -all file.pdf out
+│   │   ├── pdfinfo
+│   │   ├── pdftotext
+│   │   └── check layers
+│   │
+│   ├── Office files
+│   │   ├── unzip file.docx
+│   │   ├── inspect XML
+│   │   └── check comments/hidden text
+│   │
+│   └── Embedded content
+│       └── extract objects
+│
+├── 📦 ARCHIVES (.zip .rar .7z .tar)
+│   │
+│   ├── Extraction
+│   │   ├── unzip / 7z x
+│   │   └── tar -xf
+│   │
+│   ├── Password protected?
+│   │   ├── strings archive
+│   │   ├── zip2john → john
+│   │   ├── rar2john → john
+│   │   ├── hashcat
+│   │   └── bkcrack (known plaintext)
+│   │
+│   ├── Nested archives
+│   │   └── recursive extraction
+│   │
+│   └── Weird tricks
+│       ├── hidden files
+│       └── fake extensions
+│
+├── 💽 DISK FORENSICS (.img .dd .raw)
+│   │
+│   ├── Partitioning
+│   │   ├── mmls image
+│   │   └── fdisk -l image
+│   │
+│   ├── Filesystem
+│   │   ├── fls -r image
+│   │   ├── fls -o OFFSET image
+│   │   ├── icat image inode
+│   │   └── istat
+│   │
+│   ├── Recovery
+│   │   ├── foremost
+│   │   ├── photorec
+│   │   └── bulk_extractor
+│   │
+│   ├── Search
+│   │   ├── strings | grep flag
+│   │   └── grep -a
+│   │
+│   └── Mount
+│       └── mount -o loop,ro
+│
+├── 🧠 MEMORY FORENSICS (.mem .raw)
+│   │
+│   ├── volatility3
+│   │   ├── windows.info
+│   │   ├── windows.pslist / pstree
+│   │   ├── windows.cmdline
+│   │   ├── windows.filescan
+│   │   ├── windows.dumpfiles
+│   │   ├── windows.netscan
+│   │   └── yarascan
+│   │
+│   └── strings dump | grep flag
+│
+├── 🌐 PCAP FORENSICS (.pcap .pcapng)
+│   │
+│   ├── Wireshark
+│   │   ├── Follow TCP stream
+│   │   ├── Follow HTTP stream
+│   │   ├── Export objects
+│   │   ├── Protocol hierarchy
+│   │   └── filter credentials
+│   │
+│   ├── tshark CLI
+│   ├── DNS analysis
+│   └── extract transferred files
+│
+├── 📜 LOG FORENSICS (.log .txt .json)
+│   │
+│   ├── grep -i flag/password/admin/login/error
+│   ├── sort timeline
+│   ├── find IPs
+│   ├── find commands
+│   └── decode base64/hex/url
+│
+├── ❓ UNKNOWN FILE
+│   │
+│   ├── file
+│   ├── strings
+│   ├── xxd
+│   ├── binwalk
+│   └── exiftool
+│
+├── 2. ENCODING / OBFUSCATION
+│   │
+│   ├── base64 → decode
+│   ├── hex → xxd -r
+│   ├── url encoding
+│   ├── binary → ASCII
+│   └── compression (gzip/zlib/xz)
+│
+├── 3. HIDDEN / DELETED DATA
+│   │
+│   ├── Disk → fls / icat / photorec
+│   ├── Image → steg / appended
+│   └── Archive → nested
+│
+└── 4. LAST RESORT
+    │
+    ├── CyberChef (magic)
+    ├── metadata/comments
+    ├── timestamps
+    ├── recursive extraction
+    ├── try common passwords
+    └── re-check EVERYTHING
