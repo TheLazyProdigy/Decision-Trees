@@ -1,190 +1,248 @@
-Tools used in rev challs:
-      strings
-      file
-      objdump
-      xxd
-      hexdump
-      binwalk
-      exiftool
-      Ghidra
-      hexedit
-      gdb
-      pwndbg
-      strace
-      checksec
-      javap
-      javac
-      JD-GUI
-      UPX
-      
+TOOLS (always ready)
+│
+├── file
+├── strings
+├── xxd / hexdump
+├── ltrace / strace
+├── Ghidra / IDA / Binary Ninja
+├── gdb (+ pwndbg / gef)
+│   └── set disassembly-flavor intel
+├── objdump / readelf / nm
+├── checksec
+├── upx
+├── python
+├── CyberChef
+└── dogbolt (quick multi-decompiler comparison)
+
+────────────────────────────────────────
+
+GOLDEN RULE:
+→ UNDERSTAND LOGIC > RANDOM GUESSING
+→ STATIC + DYNAMIC COMBINED
+→ IF CONFUSED → REWRITE IN PYTHON
+→ ALWAYS VERIFY WITH RUNTIME
+
+────────────────────────────────────────
+
+MINIMAL CHECKLIST
+│
+├── file binary
+├── strings binary | grep -i flag
+├── checksec binary
+├── run binary
+├── ltrace / strace
+├── open in Ghidra
+├── search strcmp / memcmp
+├── quick check in dogbolt (compare decompilers)
+├── gdb ./binary
+├── set disassembly-flavor intel
+└── break main
+
+────────────────────────────────────────
 
 START
- |
- |--[1] Initial triage
- |      |
- |      |-- What file type is it?
- |           |
- |           |-- ELF (Linux)
- |           |-- PE (.exe Windows)
- |           |-- Mach-O (macOS)
- |           |-- Script (Python, JS, etc.)
- |
- |      |-- Run basic checks:
- |           - file
- |           - strings
- |           - checksec
- |           - ldd (Linux)
- |
- |--[2] Can you run it?
- |      |
- |      |-- YES --> Execute safely
- |      |          |
- |      |          |-- Observe:
- |      |               - input prompts
- |      |               - output messages
- |      |               - crashes
- |      |               - flag format hints
- |      |
- |      |-- NO --> Static-only path
- |
- |--[3] Quick wins (ALWAYS DO THIS)
- |      |
- |      |-- strings output contains:
- |           |
- |           |-- "flag", "CTF", "key", "pass" ?
- |           |-- suspicious base64/hex blobs?
- |           |-- URLs / file paths?
- |           |
- |           |-- YES --> decode/analyze immediately
- |
- |--[4] Packing / obfuscation?
- |      |
- |      |-- Signs:
- |           - very few strings
- |           - weird section names
- |           - high entropy
- |
- |      |-- YES --> unpack first:
- |           - UPX → `upx -d`
- |           - manual unpack via debugger
- |
- |--[5] Static analysis
- |      |
- |      |-- Load into:
- |           - Ghidra / IDA / Binary Ninja
- |
- |      |-- Find:
- |           - main()
- |           - entry point
- |
- |      |-- Identify:
- |           |
- |           |-- Input handling?
- |           |-- strcmp / memcmp?
- |           |-- loops / conditions?
- |           |-- crypto routines?
- |           |-- encoding logic?
- |
- |--[6] Input validation branch
- |      |
- |      |-- Program asks for input?
- |           |
- |           |-- YES -->
- |                |
- |                |-- Locate checks:
- |                     - strcmp
- |                     - hash comparison
- |                     - arithmetic checks
- |
- |                |-- Then:
- |                     |
- |                     |-- Simple compare?
- |                     |      --> Extract correct string
- |                     |
- |                     |-- Transformed input?
- |                     |      --> Reverse the transformation
- |                     |
- |                     |-- Complex constraints?
- |                            --> Use Z3 / symbolic execution
- |
- |--[7] Encoding / encryption branch
- |      |
- |      |-- Detect patterns:
- |           |
- |           |-- XOR?
- |           |-- Base64?
- |           |-- ROT?
- |           |-- custom loops?
- |
- |      |-- Strategy:
- |           |
- |           |-- Reimplement logic in Python
- |           |-- Reverse operations step-by-step
- |
- |--[8] Control flow complexity
- |      |
- |      |-- Many branches / conditions?
- |           |
- |           |-- YES -->
- |                |
- |                |-- Patch binary:
- |                     - bypass checks
- |                     - force success path
- |                |
- |                |-- OR dynamic analysis
- |
- |--[9] Dynamic analysis branch
- |      |
- |      |-- Use debugger:
- |           - gdb / pwndbg
- |           - x64dbg (Windows)
- |
- |      |-- Breakpoints:
- |           |
- |           |-- main
- |           |-- strcmp / memcmp
- |           |-- exit
- |
- |      |-- Inspect:
- |           - registers
- |           - stack
- |           - memory
- |
- |      |-- Trick:
- |           |
- |           |-- Stop at comparison
- |           |-- Read expected value directly
- |
- |--[10] Anti-debug / tricks?
- |       |
- |       |-- Detect:
- |            - ptrace
- |            - timing checks
- |            - weird crashes
- |
- |       |-- Bypass:
- |            - patch instructions
- |            - nop checks
- |
- |--[11] Advanced path
- |       |
- |       |-- Obfuscated logic?
- |            |
- |            |-- Use:
- |                 - symbolic execution (angr)
- |                 - emulation
- |
- |--[12] Flag retrieval
- |       |
- |       |-- Found directly in:
- |            - strings
- |            - memory dump
- |            - decoded blob
- |
- |       |-- OR:
- |            |
- |            |-- Correct input → program prints flag
- |            |
- |            |-- OR patched binary reveals flag
- |
- END
+│
+├── [1] READ CHALLENGE
+│   │
+│   ├── Identify:
+│   │   ├── input method (stdin / argv / file)
+│   │   ├── expected behavior
+│   │   └── hints (easy = XOR, hard = VM/obfuscation)
+│
+├── [2] BASIC RECON
+│   │
+│   ├── file binary
+│   ├── checksec binary
+│   ├── strings binary
+│   │   ├── flag fragments
+│   │   ├── format strings ("%s", "%x")
+│   │   ├── error messages
+│   │   └── hidden hints
+│   │
+│   ├── run binary
+│   │   ├── observe prompts
+│   │   └── test weird input
+│   │
+│   ├── ltrace
+│   │   ├── strcmp / memcmp
+│   │   ├── printf / puts
+│   │   └── input flow
+│   │
+│   └── strace
+│       ├── file access
+│       ├── syscalls
+│       └── hidden reads
+│
+├── [3] ENVIRONMENT / FILE TRICKS
+│   │
+│   ├── Symlinks (IMPORTANT)
+│   │   ├── ln -s /flag fakefile
+│   │   ├── abuse file reads
+│   │   └── trick program into reading protected files
+│   │
+│   ├── LD_PRELOAD
+│   ├── environment variables
+│   └── input redirection
+│
+├── [4] PACKING / OBFUSCATION
+│   │
+│   ├── upx?
+│   │   └── upx -d binary
+│   │
+│   ├── high entropy → packed
+│   ├── stripped symbols
+│   ├── obfuscated strings
+│   └── anti-debugging
+│
+├── [5] STATIC ANALYSIS
+│   │
+│   ├── Ghidra / IDA
+│   │
+│   ├── Use dogbolt
+│   │   ├── compare decompilers
+│   │   └── pick clearest output
+│   │
+│   ├── Find:
+│   │   ├── main()
+│   │   ├── input handling
+│   │   ├── validation function
+│   │   ├── comparison logic
+│   │   └── success condition
+│   │
+│   ├── Rename everything
+│   ├── Track data flow
+│   └── simplify logic
+│
+├── [6] FORMAT STRING / PRINTF ANALYSIS
+│   │
+│   ├── Look for:
+│   │   ├── printf(user_input)
+│   │   └── missing format string
+│   │
+│   ├── Test:
+│   │   ├── %x %x %x → stack leak
+│   │   ├── %p → pointers
+│   │   ├── %s → memory read
+│   │   └── %n → memory write
+│   │
+│   ├── Use for:
+│   │   ├── leaking flag
+│   │   ├── leaking stack/libc
+│   │   └── overwriting values
+│   │
+│   └── NOTE:
+│       format string = bridge between rev + pwn
+│
+├── [7] DYNAMIC ANALYSIS
+│   │
+│   ├── gdb
+│   │   ├── gdb ./binary
+│   │   ├── set disassembly-flavor intel
+│   │   ├── break main
+│   │   ├── break strcmp
+│   │   ├── run
+│   │   ├── run < input.txt
+│   │   ├── disassemble main
+│   │   ├── info registers
+│   │   ├── x/s $rax
+│   │   ├── x/32x $rsp
+│   │   ├── ni / si
+│   │   └── set $rax=1
+│   │
+│   ├── Observe:
+│   │   ├── input buffer
+│   │   ├── transformed values
+│   │   └── comparison result
+│   │
+│   └── Trick:
+│       └── skip checks / force success
+│
+├── [8] COMMON PATTERNS
+│   │
+│   ├── XOR
+│   │   ├── single-byte
+│   │   └── repeating key
+│   │
+│   ├── Encoding
+│   │   ├── base64
+│   │   ├── hex
+│   │   └── custom tables
+│   │
+│   ├── Arithmetic
+│   │   ├── + - *
+│   │   ├── bit shifts
+│   │   └── XOR chains
+│   │
+│   ├── Loop-based logic
+│   │   ├── per-char validation
+│   │   └── array transforms
+│   │
+│   ├── Placeholders (IMPORTANT)
+│   │   ├── fake variables
+│   │   ├── dummy operations
+│   │   └── misleading branches
+│   │
+│   └── Hardcoded flag (split/encoded)
+│
+├── [9] LOGIC RECONSTRUCTION
+│   │
+│   ├── Rewrite in Python
+│   │   ├── copy algorithm
+│   │   ├── remove noise (placeholders)
+│   │   └── reverse steps
+│   │
+│   ├── Solve:
+│   │   ├── invert operations
+│   │   ├── brute small parts
+│   │   └── simplify math
+│
+├── [10] SPECIAL CASES
+│   │
+│   ├── VM / bytecode
+│   │   ├── identify instructions
+│   │   └── emulate
+│   │
+│   ├── crypto-like logic
+│   │   └── treat as crypto problem
+│   │
+│   ├── multi-stage binary
+│   │   └── unpack layers
+│   │
+│   ├── anti-debugging
+│   │   ├── ptrace
+│   │   └── timing checks
+│   │
+│   └── self-modifying code
+│
+├── [11] PATCHING / BYPASS
+│   │
+│   ├── Patch binary
+│   │   ├── JNE → JE
+│   │   ├── NOP checks
+│   │   └── force success
+│   │
+│   ├── Hook functions (LD_PRELOAD)
+│   └── override logic
+│
+├── [12] IF STUCK
+│   │
+│   ├── re-check strings
+│   ├── compare decompilers (dogbolt)
+│   ├── isolate small parts
+│   ├── print intermediate values
+│   ├── focus on comparison logic
+│   ├── remove placeholders mentally
+│   ├── assume simple logic hidden under noise
+│   └── step through again
+│
+└── [13] FLAG
+    │
+    ├── Direct:
+    │   ├── strings
+    │   ├── memory
+    │   └── decoded constants
+    │
+    └── Indirect:
+        ├── reversed algorithm
+        ├── brute-forced input
+        └── patched execution
