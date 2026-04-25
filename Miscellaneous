@@ -1,0 +1,202 @@
+TOOLS (always ready)
+│
+├── CyberChef
+├── Python
+├── strings / file / xxd
+├── binwalk / foremost
+├── Wireshark / tshark
+├── steghide / zsteg / stegsolve
+├── QR tools (zbarimg)
+├── base64 / xxd
+├── Audacity
+├── ffmpeg
+├── exiftool
+├── john / hashcat
+├── browser / DevTools
+└── google (YES, seriously)
+
+────────────────────────────────────────
+
+GOLDEN RULE:
+→ MISC = PATTERN RECOGNITION
+→ IF IT LOOKS WEIRD → IT’S PROBABLY ENCODED / HIDDEN
+→ TRY SIMPLE THINGS FIRST
+→ THINK “WHAT IS THIS REALLY?”
+
+────────────────────────────────────────
+
+MINIMAL CHECKLIST
+│
+├── file chall
+├── strings chall | grep -i flag
+├── open file normally
+├── try CyberChef Magic
+├── check metadata (exiftool)
+├── check for hidden data (binwalk)
+├── look for encoding
+└── google unusual patterns
+
+────────────────────────────────────────
+
+START
+│
+├── [1] IDENTIFY THE CHALLENGE TYPE
+│   │
+│   ├── File given?
+│   ├── Text only?
+│   ├── Audio?
+│   ├── Image?
+│   ├── Network capture?
+│   ├── Interactive server?
+│   ├── Weird puzzle?
+│   └── Multiple files?
+│
+├── [2] FILE ANALYSIS (GENERAL)
+│   │
+│   ├── file chall
+│   ├── strings chall
+│   ├── xxd / hexdump
+│   ├── binwalk chall
+│   ├── foremost chall
+│   ├── exiftool chall
+│   │
+│   └── Ask:
+│       ├── wrong file extension?
+│       ├── embedded file?
+│       ├── hidden metadata?
+│       └── compressed data?
+│
+├── [3] ENCODING / OBFUSCATION
+│   │
+│   ├── base64 / base32 / base58
+│   ├── hex / binary
+│   ├── URL / HTML encoding
+│   ├── XOR
+│   ├── Caesar / ROT
+│   ├── substitution
+│   └── layered encoding
+│
+├── [4] IMAGE / STEGO
+│   │
+│   ├── exiftool image
+│   ├── strings image
+│   ├── binwalk -e image
+│   │
+│   ├── Stego tools
+│   │   ├── steghide
+│   │   ├── stegseek
+│   │   ├── zsteg
+│   │   └── stegsolve
+│   │
+│   ├── Visual tricks
+│   │   ├── color channels
+│   │   ├── LSB
+│   │   ├── alpha channel
+│   │   └── QR/barcode
+│   │
+│   └── PNG tricks
+│       ├── pngcheck
+│       └── chunk analysis
+│
+├── [5] AUDIO
+│   │
+│   ├── Listen
+│   ├── Audacity
+│   │   ├── spectrogram
+│   │   ├── reverse
+│   │   ├── slow/fast
+│   │
+│   ├── strings audio
+│   └── hidden signals
+│
+├── [6] NETWORK / PCAP
+│   │
+│   ├── Wireshark
+│   │   ├── follow TCP stream
+│   │   ├── export objects
+│   │   ├── DNS analysis
+│   │   └── credentials
+│   │
+│   └── tshark filtering
+│
+├── [7] FORENSICS-LIKE
+│   │
+│   ├── disk image?
+│   ├── deleted files?
+│   ├── logs?
+│   └── hidden data?
+│
+├── [8] PROGRAM / SCRIPT
+│   │
+│   ├── run it
+│   ├── read source
+│   ├── reverse logic
+│   ├── inspect input/output
+│   └── patch if needed
+│
+├── [9] INTERACTIVE / SERVER
+│   │
+│   ├── connect (nc / socket)
+│   ├── observe protocol
+│   ├── automate with Python
+│   ├── brute responses
+│   └── reverse logic
+│
+├── [10] DATA / PATTERN PUZZLES
+│   │
+│   ├── sequences
+│   │   ├── arithmetic
+│   │   ├── Fibonacci
+│   │   ├── primes
+│   │   └── OEIS search
+│   │
+│   ├── grids / mazes
+│   ├── coordinates
+│   ├── ASCII art
+│   ├── weird symbols
+│   └── visual puzzles
+│
+├── [11] OSINT / REAL WORLD
+│   │
+│   ├── reverse image search
+│   ├── google text fragments
+│   ├── check EXIF GPS
+│   ├── social media clues
+│   └── map coordinates
+│
+├── [12] MULTI-STEP CHALLS
+│   │
+│   ├── decode → extract → decode
+│   ├── unzip → decode → analyze
+│   ├── chain multiple tools
+│   └── combine categories
+│
+├── [13] WEIRD TRICKS (VERY COMMON)
+│   │
+│   ├── wrong file extension
+│   ├── hidden data after EOF
+│   ├── double encoding
+│   ├── text disguised as image/audio
+│   ├── base64 inside base64
+│   ├── zip inside image
+│   ├── flag split across files
+│   └── misleading hints
+│
+├── [14] IF STUCK
+│   │
+│   ├── try CyberChef Magic
+│   ├── google exact string
+│   ├── check file again (file/xxd)
+│   ├── re-run binwalk
+│   ├── try stego tools
+│   ├── look for repetition
+│   ├── think simpler
+│   ├── re-read challenge name
+│   └── try combining steps
+│
+└── [15] FLAG
+    │
+    ├── direct (visible)
+    ├── decoded text
+    ├── extracted file
+    └── solved puzzle output
