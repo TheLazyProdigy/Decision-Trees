@@ -1,0 +1,190 @@
+Tools used in rev challs:
+      strings
+      file
+      objdump
+      xxd
+      hexdump
+      binwalk
+      exiftool
+      Ghidra
+      hexedit
+      gdb
+      pwndbg
+      strace
+      checksec
+      javap
+      javac
+      JD-GUI
+      UPX
+      
+
+START
+ |
+ |--[1] Initial triage
+ |      |
+ |      |-- What file type is it?
+ |           |
+ |           |-- ELF (Linux)
+ |           |-- PE (.exe Windows)
+ |           |-- Mach-O (macOS)
+ |           |-- Script (Python, JS, etc.)
+ |
+ |      |-- Run basic checks:
+ |           - file
+ |           - strings
+ |           - checksec
+ |           - ldd (Linux)
+ |
+ |--[2] Can you run it?
+ |      |
+ |      |-- YES --> Execute safely
+ |      |          |
+ |      |          |-- Observe:
+ |      |               - input prompts
+ |      |               - output messages
+ |      |               - crashes
+ |      |               - flag format hints
+ |      |
+ |      |-- NO --> Static-only path
+ |
+ |--[3] Quick wins (ALWAYS DO THIS)
+ |      |
+ |      |-- strings output contains:
+ |           |
+ |           |-- "flag", "CTF", "key", "pass" ?
+ |           |-- suspicious base64/hex blobs?
+ |           |-- URLs / file paths?
+ |           |
+ |           |-- YES --> decode/analyze immediately
+ |
+ |--[4] Packing / obfuscation?
+ |      |
+ |      |-- Signs:
+ |           - very few strings
+ |           - weird section names
+ |           - high entropy
+ |
+ |      |-- YES --> unpack first:
+ |           - UPX → `upx -d`
+ |           - manual unpack via debugger
+ |
+ |--[5] Static analysis
+ |      |
+ |      |-- Load into:
+ |           - Ghidra / IDA / Binary Ninja
+ |
+ |      |-- Find:
+ |           - main()
+ |           - entry point
+ |
+ |      |-- Identify:
+ |           |
+ |           |-- Input handling?
+ |           |-- strcmp / memcmp?
+ |           |-- loops / conditions?
+ |           |-- crypto routines?
+ |           |-- encoding logic?
+ |
+ |--[6] Input validation branch
+ |      |
+ |      |-- Program asks for input?
+ |           |
+ |           |-- YES -->
+ |                |
+ |                |-- Locate checks:
+ |                     - strcmp
+ |                     - hash comparison
+ |                     - arithmetic checks
+ |
+ |                |-- Then:
+ |                     |
+ |                     |-- Simple compare?
+ |                     |      --> Extract correct string
+ |                     |
+ |                     |-- Transformed input?
+ |                     |      --> Reverse the transformation
+ |                     |
+ |                     |-- Complex constraints?
+ |                            --> Use Z3 / symbolic execution
+ |
+ |--[7] Encoding / encryption branch
+ |      |
+ |      |-- Detect patterns:
+ |           |
+ |           |-- XOR?
+ |           |-- Base64?
+ |           |-- ROT?
+ |           |-- custom loops?
+ |
+ |      |-- Strategy:
+ |           |
+ |           |-- Reimplement logic in Python
+ |           |-- Reverse operations step-by-step
+ |
+ |--[8] Control flow complexity
+ |      |
+ |      |-- Many branches / conditions?
+ |           |
+ |           |-- YES -->
+ |                |
+ |                |-- Patch binary:
+ |                     - bypass checks
+ |                     - force success path
+ |                |
+ |                |-- OR dynamic analysis
+ |
+ |--[9] Dynamic analysis branch
+ |      |
+ |      |-- Use debugger:
+ |           - gdb / pwndbg
+ |           - x64dbg (Windows)
+ |
+ |      |-- Breakpoints:
+ |           |
+ |           |-- main
+ |           |-- strcmp / memcmp
+ |           |-- exit
+ |
+ |      |-- Inspect:
+ |           - registers
+ |           - stack
+ |           - memory
+ |
+ |      |-- Trick:
+ |           |
+ |           |-- Stop at comparison
+ |           |-- Read expected value directly
+ |
+ |--[10] Anti-debug / tricks?
+ |       |
+ |       |-- Detect:
+ |            - ptrace
+ |            - timing checks
+ |            - weird crashes
+ |
+ |       |-- Bypass:
+ |            - patch instructions
+ |            - nop checks
+ |
+ |--[11] Advanced path
+ |       |
+ |       |-- Obfuscated logic?
+ |            |
+ |            |-- Use:
+ |                 - symbolic execution (angr)
+ |                 - emulation
+ |
+ |--[12] Flag retrieval
+ |       |
+ |       |-- Found directly in:
+ |            - strings
+ |            - memory dump
+ |            - decoded blob
+ |
+ |       |-- OR:
+ |            |
+ |            |-- Correct input → program prints flag
+ |            |
+ |            |-- OR patched binary reveals flag
+ |
+ END
